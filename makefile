@@ -18,7 +18,8 @@ SRC := $(wildcard \
 	physics/spatial/*.c \
 	render/*.c \
 	spawn/*.c \
-	util/*.c)
+	util/*.c \
+	ui/*.c)
 
 OBJ := $(SRC:.c=.o)
 

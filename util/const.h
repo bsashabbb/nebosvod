@@ -1,7 +1,7 @@
 #pragma once
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
 #define TARGET_FPS 30.0f
 
 #define WORLD_HALF_SIZE 50000.0f
