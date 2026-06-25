@@ -1,4 +1,5 @@
 #include "app.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "raylib.h"
@@ -79,6 +80,8 @@ void init_app(AppContext *app_ctx) {
 void start_app(AppContext *app_ctx) {
 
     bool dragging = false;
+    bool running = false;
+    bool render = true;
     Vector2 lastMousePosition = {0};
     float accumulator = 0;
 
@@ -89,60 +92,65 @@ void start_app(AppContext *app_ctx) {
     
     while (!WindowShouldClose()) {
         float frametime = GetFrameTime();
-
-        // if (GetFPS() < TARGET_FPS * 0.5f && steps_per_frame > 0) {
-        //     steps_per_frame *= (GetFPS() / TARGET_FPS);
-        //     steps_per_frame = fmaxf(steps_per_frame, 1);
-        // } else if (GetFPS() == TARGET_FPS && steps_per_frame < STEPS_PER_FRAME && world.step % 100 == 0) {
-        //     steps_per_frame++;
-        // }
-
-        // int steps = steps_per_frame;
-        // steps_per_frame = ctx.world.step > 1700? 1 : 100;
-        // for (int i = 0; i < steps_per_frame; i++) {
-        //     step_world(&ctx, &cfg);
-        //     // if (ctx.world.step > 2000) 
-        //         print_world(&ctx.world);
-        //     // if (ctx.world.step > 2200) 
-        //     //     return 0;
-        // }
-
-        // update_stats(&ctx, &cfg);  
-
-        // accumulator += frametime * STEPS_PER_FRAME;
-        // steps_per_frame = 0;
-        // while (accumulator >= DT) {
-        //     step_world(&world);
-        //     accumulator -= DT;
-        //     steps_per_frame++;
-        // }        
-        
-        
-        double sim_budget = 1 / TARGET_FPS; // ms per frame for simulation
-        double start = GetTime();
         int steps = 0;
-        while ((GetTime() - start) < sim_budget) {
-            step_world(&app_ctx->ctx, &app_ctx->cfg);
-            steps++;
-            if (app_ctx->ctx.world.step % 1000 == 0) {
-                printf("step: %d\n", app_ctx->ctx.world.step);
-                print_world(&app_ctx->ctx.world);
-            }
-        }
 
-        // double currentTime = GetTime();
-        // if (currentTime - lastUpdateTime >= 1.0f) {
-        //     update_stats(&world);  
-        //     lastUpdateTime = currentTime;
-        // }
-         
-        // print_world(&world);
+        if (running) {
+            // if (GetFPS() < TARGET_FPS * 0.5f && steps_per_frame > 0) {
+            //     steps_per_frame *= (GetFPS() / TARGET_FPS);
+            //     steps_per_frame = fmaxf(steps_per_frame, 1);
+            // } else if (GetFPS() == TARGET_FPS && steps_per_frame < STEPS_PER_FRAME && world.step % 100 == 0) {
+            //     steps_per_frame++;
+            // }
+
+            // int steps = steps_per_frame;
+            // steps_per_frame = ctx.world.step > 1700? 1 : 100;
+            // for (int i = 0; i < steps_per_frame; i++) {
+            //     step_world(&ctx, &cfg);
+            //     // if (ctx.world.step > 2000) 
+            //         print_world(&ctx.world);
+            //     // if (ctx.world.step > 2200) 
+            //     //     return 0;
+            // }
+
+            // update_stats(&ctx, &cfg);  
+
+            // accumulator += frametime * STEPS_PER_FRAME;
+            // steps_per_frame = 0;
+            // while (accumulator >= DT) {
+            //     step_world(&world);
+            //     accumulator -= DT;
+            //     steps_per_frame++;
+            // }        
+            
+            
+            double sim_budget = 1.0f / TARGET_FPS; // ms per frame for simulation
+            double start = GetTime();
+            while ((GetTime() - start) < sim_budget) {
+                step_world(&app_ctx->ctx, &app_ctx->cfg);
+                steps++;
+                if (app_ctx->ctx.world.step % 1000 == 0) {
+                    printf("step: %d\n", app_ctx->ctx.world.step);
+                    // print_world(&app_ctx->ctx.world);
+                }
+            }
+
+            // double currentTime = GetTime();
+            // if (currentTime - lastUpdateTime >= 1.0f) {
+            //     update_stats(&world);  
+            //     lastUpdateTime = currentTime;
+            // }
+            
+            // print_world(&world);
+        }
+        
+        if (IsKeyReleased(KEY_SPACE)) running = !running;
+        if (IsKeyReleased(KEY_R)) render = !render;
 
         if (IsKeyDown(KEY_RIGHT)) app_ctx->camera.target.x += 600.0f / app_ctx->camera.zoom * frametime;
         if (IsKeyDown(KEY_LEFT)) app_ctx->camera.target.x -= 600.0f / app_ctx->camera.zoom * frametime;
         if (IsKeyDown(KEY_DOWN)) app_ctx->camera.target.y += 600.0f / app_ctx->camera.zoom * frametime;
         if (IsKeyDown(KEY_UP)) app_ctx->camera.target.y -= 600.0f / app_ctx->camera.zoom * frametime;
-        if (IsKeyDown(KEY_SPACE)) {
+        if (IsKeyDown(KEY_C)) {
             app_ctx->camera.target.x = app_ctx->ctx.com_x;
             app_ctx->camera.target.y = app_ctx->ctx.com_y;
         }
@@ -172,29 +180,31 @@ void start_app(AppContext *app_ctx) {
         }
 
         BeginDrawing();
-        BeginMode2D(app_ctx->camera);
-            ClearBackground(BLACK);
-            
-            // draw coordinate axes
-            // DrawLine(-BH_ROOT_SIZE * 0.5, 0, BH_ROOT_SIZE * 0.5, 0, GRAY);
-            // DrawLine(0, -BH_ROOT_SIZE * 0.5, 0, BH_ROOT_SIZE * 0.5, GRAY);
+            BeginMode2D(app_ctx->camera);
+                ClearBackground(BLACK);
+                if (render) {                        
+                    // draw coordinate axes
+                    // DrawLine(-BH_ROOT_SIZE * 0.5, 0, BH_ROOT_SIZE * 0.5, 0, GRAY);
+                    // DrawLine(0, -BH_ROOT_SIZE * 0.5, 0, BH_ROOT_SIZE * 0.5, GRAY);
 
-            // visualise_bh_tree(&ctx.world);
-            // visualise_grid(&ctx);
+                    // visualise_bh_tree(&ctx.world);
+                    // visualise_grid(&ctx);
 
-            render_world(&app_ctx->ctx.world, V_LINE_LENGTH);
-        EndMode2D();
-        snprintf(text_buffer, sizeof(text_buffer),
-        "FPS: %d\nSPS: %d\nStep: %d\n"
-        "Particles: %u\nTotal mass: %.2f\nMax mass: %.2f\n"
-        "Temperature: %.2f\nKinetic energy: %.2f\nPotential energy: %.2f\nTotal energy: %.2f\nAng. momentum: %.2f\n",
-        GetFPS(), GetFPS() * steps, app_ctx->ctx.world.step,
-        app_ctx->ctx.world.p_count, app_ctx->ctx.total_mass, app_ctx->ctx.max_mass,
-        app_ctx->ctx.temperature, app_ctx->ctx.kin_energy, app_ctx->ctx.pot_energy,
-        app_ctx->ctx.kin_energy + app_ctx->ctx.pot_energy,
-        app_ctx->ctx.ang_momentum
-    );
-        DrawText(text_buffer, 10, 10, 20, GREEN);
+                    render_world(&app_ctx->ctx.world, V_LINE_LENGTH);
+                }
+            EndMode2D();
+
+            snprintf(text_buffer, sizeof(text_buffer),
+                "FPS: %d\nSPS: %d\nStep: %d\n"
+                "Particles: %u\nTotal mass: %.2f\nMax mass: %.2f\n"
+                "Temperature: %.2f\nKinetic energy: %.2f\nPotential energy: %.2f\nTotal energy: %.2f\nAng. momentum: %.2f\n",
+                GetFPS(), GetFPS() * steps, app_ctx->ctx.world.step,
+                app_ctx->ctx.world.p_count, app_ctx->ctx.total_mass, app_ctx->ctx.max_mass,
+                app_ctx->ctx.temperature, app_ctx->ctx.kin_energy, app_ctx->ctx.pot_energy,
+                app_ctx->ctx.kin_energy + app_ctx->ctx.pot_energy,
+                app_ctx->ctx.ang_momentum
+            );
+            DrawText(text_buffer, 10, 10, 20, GREEN);
         EndDrawing();
     }
 
