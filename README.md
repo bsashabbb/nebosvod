@@ -10,7 +10,7 @@
 
 ## Реализация
 
-"Небосвод" написан на C и использует raylib для графики. Интерфейс реализован с помощью собственной библиотеки "Бетон" от RedCat17.
+"Небосвод" написан на C и использует raylib для графики. Интерфейс реализован с помощью собственной [библиотеки "Бетон"](https://github.com/RedCat17/beton) от RedCat17.
 
 Для расчета гравитации используется алгоритм Барнса-Хата (Barnes-Hut). В отличие от наивного подхода со сложностью порядка O(n^2), где каждая частица взаимодействует с каждой, алгоритм Барнса-Хата обеспечивает сложность O(n log n). Это позволяет масштабировать симуляцию на куда большее число частиц. Принцип алгоритма таков: дальние кластеры частиц обрабатываются как единая масса. Для этого строится дерево квадрантов (quadtree), где каждый узел обладает своей массой. Алгоритм состоит из двух этапов: построение дерева и расчёт сил.
 
@@ -37,3 +37,41 @@ make
 Справа расположена панель со статистикой.
 
 Внизу находится меню управления с паузой (ползунок ничего не делает).
+
+# Nebosvod
+
+## Overview
+
+Nebosvod is astrophysical N-body simulation with accretion. Particless attract each other, collide and merge into larger ones. Over time, planetoids emerge from particle cloud around the star. 
+
+The goal of the project was to simulate planetary system formation from dust cloud. Overall, the goal was achieved. Though, produced model of accretion only shows qualitative similarity and isn't yet physically accurate.
+
+![Screenshot](assets/nebosvod.png)
+
+## Implementation
+
+Nebosvod is written in C using raylib for graphics. UI is implemented using [Beton IMGUI](https://github.com/RedCat17/beton).
+
+Barnes-Hut algorithm is used for gravity. It scales much better than naive pairwise approach.
+
+Force calculation is parallelised, boosting performance several times.
+
+Spatial grid is used to optimise collisions.
+
+Two intergators were implemented: implicit Euler and Verlet. Euler doesn't conserve energy, so it was replaced by Verlet which is a simmetrical integrator.
+
+## Building
+```bash
+git clone https://github.com/RedCat17/nebosvod.git
+cd nebosvod
+make
+```
+```bash
+./build/main
+```
+
+## Usage
+
+To the right, there is info panel.
+
+On the bottom, there is control menu with pause button.

@@ -145,11 +145,11 @@ void start_app(AppContext *app_ctx) {
             // }
 
             // int steps = steps_per_frame;
-            // steps_per_frame = ctx.world.step > 1700? 1 : 100;
+            // // steps_per_frame = app_ctx->ctx.world.step > 1700? 1 : 100;
             // for (int i = 0; i < steps_per_frame; i++) {
-            //     step_world(&ctx, &cfg);
+            //     step_world(&app_ctx->ctx, &app_ctx->cfg);
             //     // if (ctx.world.step > 2000) 
-            //         print_world(&ctx.world);
+            //         // print_world(&app_ctx->ctx.world);
             //     // if (ctx.world.step > 2200) 
             //     //     return 0;
             // }

@@ -15,7 +15,7 @@
 
 #define THREADS 8
 
-#define STEPS_PER_FRAME 10
+#define STEPS_PER_FRAME 100
 
 // #define PAIR_CACHE_SIZE 16536
 #define PAIR_CACHE_SIZE 131072
