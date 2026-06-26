@@ -129,7 +129,7 @@ void start_app(AppContext *app_ctx) {
     app_ctx->camera.target = (Vector2){ 0, 0 };     // What point in world space the camera looks at
     app_ctx->camera.offset = (Vector2){ sim_viewport.width * 0.5f, sim_viewport.height * 0.5f }; // Center of the screen
     app_ctx->camera.rotation = 0.0f;                      // No rotation
-    app_ctx->camera.zoom = 0.05f;                          // Normal zoom
+    app_ctx->camera.zoom = 0.05f / RENDER_SCALE;                          // Normal zoom
 
     
     while (!WindowShouldClose()) {
@@ -213,7 +213,7 @@ void start_app(AppContext *app_ctx) {
                 if (GetMouseWheelMove() == 1) app_ctx->camera.zoom *= 1.2f;
                 if (GetMouseWheelMove() == -1) app_ctx->camera.zoom /= 1.2f;
 
-                if (app_ctx->camera.zoom < 0.01f) app_ctx->camera.zoom = 0.01f;
+                app_ctx->camera.zoom = fmaxf(app_ctx->camera.zoom, 0.01f / RENDER_SCALE);
                 // Start drag
                 if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
                     dragging = true;
@@ -238,7 +238,7 @@ void start_app(AppContext *app_ctx) {
 
             if (following_p >= 0) {
                 Particle* p = &app_ctx->ctx.world.particles[following_p];
-                app_ctx->camera.target = (Vector2){p->x, p->y};
+                app_ctx->camera.target = (Vector2){p->x * RENDER_SCALE, p->y * RENDER_SCALE};
             }
         
         UI_End(&app_ctx->ui);

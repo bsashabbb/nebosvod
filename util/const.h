@@ -20,4 +20,5 @@
 // #define PAIR_CACHE_SIZE 16536
 #define PAIR_CACHE_SIZE 131072
 
+#define RENDER_SCALE 100.0f
 #define V_LINE_LENGTH 1 // длина линий скорости
