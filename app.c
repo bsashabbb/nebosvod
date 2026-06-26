@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "core/particle.h"
 #include "raylib.h"
 #include "raymath.h"
 
@@ -75,11 +76,13 @@ void start_app(AppContext *app_ctx) {
 
     int screen_width = GetScreenWidth();
     int screen_height = GetScreenHeight();
+    
     int dragging = false;
     int running = false;
     int render = true;
     int render_lines = true;
 
+    int following_p = -1;
     Vector2 lastMousePosition = {0};
     float accumulator = 0;
 
@@ -195,6 +198,7 @@ void start_app(AppContext *app_ctx) {
             if (IsKeyReleased(KEY_SPACE)) running = !running;
             if (IsKeyReleased(KEY_R)) render = !render;
             if (IsKeyReleased(KEY_V)) render_lines = !render_lines;
+            if (IsKeyReleased(KEY_F)) following_p = rand() % app_ctx->ctx.world.p_count;
 
             if (IsKeyDown(KEY_RIGHT)) app_ctx->camera.target.x += 600.0f / app_ctx->camera.zoom * frametime;
             if (IsKeyDown(KEY_LEFT)) app_ctx->camera.target.x -= 600.0f / app_ctx->camera.zoom * frametime;
@@ -224,11 +228,17 @@ void start_app(AppContext *app_ctx) {
 
             // Handle dragging
             if (dragging) {
+                following_p = -1;
                 Vector2 currentMouse = app_ctx->ui.mouse_input.pos;
                 Vector2 delta = Vector2Subtract(lastMousePosition, currentMouse);
                 delta = Vector2Scale(delta, 1.0f / app_ctx->camera.zoom);
                 app_ctx->camera.target = Vector2Add(app_ctx->camera.target, delta);
                 lastMousePosition = currentMouse;
+            }
+
+            if (following_p >= 0) {
+                Particle* p = &app_ctx->ctx.world.particles[following_p];
+                app_ctx->camera.target = (Vector2){p->x, p->y};
             }
         
         UI_End(&app_ctx->ui);
